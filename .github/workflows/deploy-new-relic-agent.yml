@@ -25,12 +25,16 @@ jobs:
       if: success()
       run: az group list --output table --debug
 
-    - name: Install New Relic Agent
+    - name: Download and Install New Relic Agent
       run: |
-        # Download and install the New Relic agent
-        curl -O https://download.newrelic.com/install/newrelic-infra/agent/newrelic-infra-linux-amd64.tar.gz
-        tar -xvf newrelic-infra-linux-amd64.tar.gz
-        cd newrelic-infra-linux-amd64
-        sudo ./newrelic-infra-ctl -l ae4f67198be65ab783366eb38e896e27FFFFNRAL --display-name test
+        # Download the New Relic agent archive
+        wget https://download.newrelic.com/install/newrelic-infra/agent/newrelic-infra-linux-amd64.tar.gz
 
-    # Replace <YOUR_LICENSE_KEY> and <YOUR_DISPLAY_NAME> with your New Relic license key and display name.
+        # Extract the archive
+        tar -xzf newrelic-infra-linux-amd64.tar.gz
+
+        # Change to the extracted directory
+        cd newrelic-infra-linux-amd64
+
+        # Install the New Relic agent (replace <YOUR_LICENSE_KEY> and <YOUR_DISPLAY_NAME>)
+        sudo ./newrelic-infra-ctl -l ae4f67198be65ab783366eb38e896e27FFFFNRAL --display-name "test"
