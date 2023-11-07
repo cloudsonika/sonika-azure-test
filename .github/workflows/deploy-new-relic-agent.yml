@@ -5,11 +5,13 @@ on:
     branches:
       - main
   workflow_dispatch:
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
-  deploy-new-relic-agent:
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
     - name: Azure Login
       uses: azure/login@v1
@@ -23,24 +25,12 @@ jobs:
       if: success()
       run: az group list --output table --debug
 
-    - name: Copy New Relic Agent Installer Script
-      run: |
-        curl -o newrelic-agent-install.sh https://download.newrelic.com/install/newrelic-agent/newrelic-cli/scripts/install.sh
-        chmod +x newrelic-agent-install.sh
-      continue-on-error: true
-
     - name: Install New Relic Agent
       run: |
-        ./newrelic-agent-install.sh \
-          --set license_key=${{ secrets.NEW_RELIC_LICENSE_KEY }} \
-          --set display_name=<VM_DISPLAY_NAME>
-      continue-on-error: true
+        # Download and install the New Relic agent
+        curl -O https://download.newrelic.com/install/newrelic-infra/agent/newrelic-infra-linux-amd64.tar.gz
+        tar -xvf newrelic-infra-linux-amd64.tar.gz
+        cd newrelic-infra-linux-amd64
+        sudo ./newrelic-infra-ctl -l ae4f67198be65ab783366eb38e896e27FFFFNRAL --display-name test
 
-    - name: Restart Service
-      run: sudo systemctl restart newrelic-infra
-
-    - name: Clean Up Installer Script
-      run: rm -f newrelic-agent-install.sh
-
-    - name: Check New Relic Agent Status
-      run: systemctl status newrelic-infra
+    # Replace <YOUR_LICENSE_KEY> and <YOUR_DISPLAY_NAME> with your New Relic license key and display name.
