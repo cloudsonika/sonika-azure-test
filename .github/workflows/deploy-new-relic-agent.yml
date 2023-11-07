@@ -1,16 +1,19 @@
-name: Azure Login With No Subscriptions
+name: Deploy New Relic Agent to Azure VM
 
 on:
   push:
     branches:
       - main
   workflow_dispatch:
+
 permissions:
-    id-token: write
-    contents: read
+  id-token: write
+  contents: read
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
     - uses: azure/login@v1
       with:
@@ -20,6 +23,19 @@ jobs:
         # client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
         enable-AzPSSession: true
         # allow-no-subscriptions: true
+
     - name: List Azure Resource Groups with Azure CLI
       if: success()
       run: az group list --output table --debug
+
+    - name: Deploy New Relic Agent to Azure VM
+      if: success()
+      run: |
+        # Replace with your Azure VM details and New Relic agent installation script
+        RESOURCE_GROUP_NAME="test"
+        VM_NAME="linux-sonika"
+        NR_LICENSE_KEY="ae4f67198be65ab783366eb38e896e27FFFFNRAL"
+
+        # SSH into the Azure VM and install New Relic agent
+        az vm open-port --port 22 --resource-group $RESOURCE_GROUP_NAME --name $VM_NAME
+        ssh azureuser@$VM_NAME "bash -s" < install_newrelic_agent.sh $NR_LICENSE_KEY
