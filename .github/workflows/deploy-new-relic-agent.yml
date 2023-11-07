@@ -6,18 +6,11 @@ on:
       - main
   workflow_dispatch:
 
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
-  deploy-newrelic-agent:
+  deploy-new-relic-agent:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
     - name: Azure Login
       uses: azure/login@v1
       with:
@@ -30,19 +23,24 @@ jobs:
       if: success()
       run: az group list --output table --debug
 
-    - name: Install New Relic Infra Agent
+    - name: Copy New Relic Agent Installer Script
       run: |
-        # Replace with your New Relic license key and download URL
-        NR_LICENSE_KEY="ae4f67198be65ab783366eb38e896e27FFFFNRAL"
-        NR_AGENT_URL="curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash && sudo NEW_RELIC_API_KEY=NRAK-WFR4FEIQIFHDG3LDLTT9BEWZVY8 NEW_RELIC_ACCOUNT_ID=4183826 /usr/local/bin/newrelic install"
-        # Download and install New Relic Infra Agent
-        curl -L $NR_AGENT_URL -o newrelic-infra.tar.gz
-        tar xzf newrelic-infra.tar.gz
-        cd newrelic-infra-linux-*
-        sudo ./nri-agent -register -licenseKey=$NR_LICENSE_KEY
+        curl -o newrelic-agent-install.sh https://download.newrelic.com/install/newrelic-agent/newrelic-cli/scripts/install.sh
+        chmod +x newrelic-agent-install.sh
+      continue-on-error: true
 
-    - name: Restart New Relic Agent
+    - name: Install New Relic Agent
+      run: |
+        ./newrelic-agent-install.sh \
+          --set license_key=${{ secrets.NEW_RELIC_LICENSE_KEY }} \
+          --set display_name=<VM_DISPLAY_NAME>
+      continue-on-error: true
+
+    - name: Restart Service
       run: sudo systemctl restart newrelic-infra
 
+    - name: Clean Up Installer Script
+      run: rm -f newrelic-agent-install.sh
+
     - name: Check New Relic Agent Status
-      run: sudo systemctl status newrelic-infra
+      run: systemctl status newrelic-infra
