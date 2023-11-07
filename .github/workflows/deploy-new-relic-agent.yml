@@ -28,7 +28,7 @@ jobs:
     - name: Download and Install New Relic Agent
       run: |
         # Download the New Relic agent archive
-        wget https://download.newrelic.com/install/newrelic-infra/agent/newrelic-infra-linux-amd64.tar.gz
+        wget https://download.newrelic.com/infrastructure_agent/linux/newrelic-infra-linux-amd64.tar.gz
 
         # Extract the archive
         tar -xzf newrelic-infra-linux-amd64.tar.gz
@@ -36,5 +36,5 @@ jobs:
         # Change to the extracted directory
         cd newrelic-infra-linux-amd64
 
-        # Install the New Relic agent (replace <YOUR_LICENSE_KEY> and <YOUR_DISPLAY_NAME>)
+        # Install the New Relic agent with your license key and display name
         sudo ./newrelic-infra-ctl -l ae4f67198be65ab783366eb38e896e27FFFFNRAL --display-name "test"
