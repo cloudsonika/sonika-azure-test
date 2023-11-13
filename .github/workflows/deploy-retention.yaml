@@ -31,11 +31,12 @@ jobs:
           curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash
           sudo NEW_RELIC_API_KEY=${{ secrets.NEW_RELIC_API_KEY }} NEW_RELIC_ACCOUNT_ID=${{ secrets.NEW_RELIC_ACCOUNT_ID }} /usr/local/bin/newrelic install
 
-      - name: Install New Relic APM
+      - name: Install New Relic APM for PHP
         run: |
-          # Install New Relic APM using the appropriate command or script
-          # For example, using the New Relic CLI:
-          sudo NEW_RELIC_API_KEY=${{ secrets.NEW_RELIC_API_KEY }} NEW_RELIC_ACCOUNT_ID=${{ secrets.NEW_RELIC_ACCOUNT_ID }} /usr/local/bin/newrelic install --type=php
+          # Install New Relic APM for PHP using composer
+          sudo apt-get update
+          sudo apt-get install -y php composer
+          composer require newrelic/php-agent
 
       - name: Change APM Data Retention Configuration
         run: |
