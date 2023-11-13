@@ -26,17 +26,25 @@ jobs:
         if: success()
         run: az group list --output table --debug
 
-      - name: Install New Relic Infrastructure Agent
+      - name: Create composer.json
         run: |
-          curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash
-          sudo NEW_RELIC_API_KEY=${{ secrets.NEW_RELIC_API_KEY }} NEW_RELIC_ACCOUNT_ID=${{ secrets.NEW_RELIC_ACCOUNT_ID }} /usr/local/bin/newrelic install
+          echo '{
+            "name": "your-username/your-project-name",
+            "require": {
+                "newrelic/php-agent": "^9.17"
+            },
+            "minimum-stability": "stable",
+            "prefer-stable": true
+          }' > composer.json
+
+      - name: Install Composer
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y php composer
 
       - name: Install New Relic APM for PHP
         run: |
-          # Install New Relic APM for PHP using composer
-          sudo apt-get update
-          sudo apt-get install -y php composer
-          composer require newrelic/php-agent
+          composer install
 
       - name: Change APM Data Retention Configuration
         run: |
