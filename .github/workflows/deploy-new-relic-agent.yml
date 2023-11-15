@@ -1,31 +1,31 @@
-name: Deploy New Relic Agent to Azure VM
+# name: Deploy New Relic Agent to Azure VM
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-permissions:
-  id-token: write
-  contents: read
+# on:
+#   push:
+#     branches:
+#       - main
+#   workflow_dispatch:
+# permissions:
+#   id-token: write
+#   contents: read
 
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Azure Login
-      uses: azure/login@v1
-      with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        enable-AzPSSession: true
+# jobs:
+#   build-and-deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Azure Login
+#       uses: azure/login@v1
+#       with:
+#         client-id: ${{ secrets.AZURE_CLIENT_ID }}
+#         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+#         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+#         enable-AzPSSession: true
 
-    - name: List Azure Resource Groups
-      if: success()
-      run: az group list --output table --debug
+#     - name: List Azure Resource Groups
+#       if: success()
+#       run: az group list --output table --debug
 
-    - name: Install New Relic Infrastructure Agent
-      run: |
-        curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash
-        sudo NEW_RELIC_API_KEY=NRAK-WFR4FEIQIFHDG3LDLTT9BEWZVY8 NEW_RELIC_ACCOUNT_ID=4183826 /usr/local/bin/newrelic install
+#     - name: Install New Relic Infrastructure Agent
+#       run: |
+#         curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash
+#         sudo NEW_RELIC_API_KEY=NRAK-WFR4FEIQIFHDG3LDLTT9BEWZVY8 NEW_RELIC_ACCOUNT_ID=4183826 /usr/local/bin/newrelic install
