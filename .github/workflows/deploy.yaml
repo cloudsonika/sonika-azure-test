@@ -1,0 +1,54 @@
+name: Deploy New Relic APM and Change Data Retention
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+
+      - name: List Azure Resource Groups
+        if: success()
+        run: az group list --output table --debug
+
+      - name: Install New Relic CLI
+        run: |
+          curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash
+
+      - name: Set up New Relic
+        run: |
+          sudo NEW_RELIC_API_KEY=${{ secrets.NEW_RELIC_API_KEY }} NEW_RELIC_ACCOUNT_ID=${{ secrets.NEW_RELIC_ACCOUNT_ID }} /usr/local/bin/newrelic install
+
+      - name: Change APM Data Retention Configuration
+        run: |
+          # Implement logic to change data retention specifically for APM in New Relic
+          # You can use the New Relic REST API to change APM data retention settings
+
+          # Example: Changing APM data retention using curl and the New Relic API
+          NR_API_KEY="${{ secrets.NEW_RELIC_API_KEY }}"
+          NR_ACCOUNT_ID="${{ secrets.NEW_RELIC_ACCOUNT_ID }}"
+          RETENTION_DAYS="${{ secrets.DATA_RETENTION_DAYS }}"  # Set your desired retention period in GitHub Secrets
+
+          curl -X PUT "https://api.newrelic.com/v2/accounts/$NR_ACCOUNT_ID/data_retention.json" \
+            -H "Api-Key: $NR_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "data_retention": {
+                "apm_data": "'$RETENTION_DAYS'"
+              }
+            }'
