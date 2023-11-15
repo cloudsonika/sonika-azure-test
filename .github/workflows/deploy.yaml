@@ -34,17 +34,23 @@ jobs:
         run: |
           sudo NEW_RELIC_API_KEY=${{ secrets.NEW_RELIC_API_KEY }} NEW_RELIC_ACCOUNT_ID=${{ secrets.NEW_RELIC_ACCOUNT_ID }} /usr/local/bin/newrelic install
 
-      - name: Change APM Data Retention Configuration
+      - name: Debug Info
         run: |
-          # Implement logic to change data retention specifically for APM in New Relic
-          # You can use the New Relic REST API to change APM data retention settings
-
-          # Example: Changing APM data retention using curl and the New Relic API
           NR_API_KEY="${{ secrets.NEW_RELIC_API_KEY }}"
           NR_ACCOUNT_ID="${{ secrets.NEW_RELIC_ACCOUNT_ID }}"
-          RETENTION_DAYS="${{ secrets.DATA_RETENTION_DAYS }}"  # Set your desired retention period in GitHub Secrets
+          RETENTION_DAYS="${{ secrets.DATA_RETENTION_DAYS }}"
 
-          curl -X PUT "https://api.newrelic.com/v2/accounts/$NR_ACCOUNT_ID/data_retention.json" \
+          echo "NR_API_KEY: $NR_API_KEY"
+          echo "NR_ACCOUNT_ID: $NR_ACCOUNT_ID"
+          echo "RETENTION_DAYS: $RETENTION_DAYS"
+
+      - name: Change APM Data Retention Configuration
+        run: |
+          NR_API_KEY="${{ secrets.NEW_RELIC_API_KEY }}"
+          NR_ACCOUNT_ID="${{ secrets.NEW_RELIC_ACCOUNT_ID }}"
+          RETENTION_DAYS="${{ secrets.DATA_RETENTION_DAYS }}"
+
+          curl -v -X PUT "https://api.newrelic.com/v2/accounts/$NR_ACCOUNT_ID/data_retention.json" \
             -H "Api-Key: $NR_API_KEY" \
             -H "Content-Type: application/json" \
             -d '{
