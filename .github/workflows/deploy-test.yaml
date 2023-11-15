@@ -43,9 +43,10 @@ jobs:
       - name: Install New Relic APM for Node.js
         run: |
           npm install newrelic
-          NEW_RELIC_LICENSE_KEY=${{ secrets.NEW_RELIC_LICENSE_KEY }} node -r newrelic index.js
+          NEW_RELIC_LICENSE_KEY=${{ secrets.NEW_RELIC_LICENSE_KEY }} node -r newrelic ./index.js
         env:
           NEW_RELIC_APP_NAME: 'test'
+        working-directory: ./
 
       - name: Change APM Data Retention Configuration
         run: |
